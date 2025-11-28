@@ -12,10 +12,15 @@ app.use(bodyParser.json());
 // Import API routes
 const apiRoutes = require('./apiRoutes');
 
-
-
 // Use API routes
 app.use('/api', apiRoutes);
+
+// 2. Catch-all: Serve the React index.html for all other routes
+// This MUST be the LAST route defined. It ensures client-side routing works.
+// If the request isn't for /api, Express sends the React app.
+app.get('*', (req, res) => { // <-- ADD THIS CATCH-ALL BLOCK
+  res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
+});
 
 // IMPORTANT: Export the app instance for Vercel
 module.exports = app;
