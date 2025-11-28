@@ -1,12 +1,6 @@
 {
-  "functions": {
-    "server.js": {
-      "runtime": "@vercel/node@20.x"
-    }
-  },
   "rewrites": [
-    
-    {
+        {
       "source": "/api/(.*)",
       "destination": "/server.js"
     },
