@@ -1,5 +1,25 @@
 {
+  "functions": {
+    "server.js": {
+      "runtime": "@vercel/node@20.x"
+    }
+  },
+  "public": true,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build" 
+      }
+    }
+  ],
   "rewrites": [
+   
+    {
+      "source": "/static/(.*)",
+      "destination": "/frontend/build/static/$1"
+    },
    
     {
       "source": "/api/(.*)",
