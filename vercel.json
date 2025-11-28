@@ -15,7 +15,7 @@
     { "src": "^/api/(.*)$", "dest": "/server.js" },
     {
       "src": "^(.*)$",
-      "dest": "/build/index.html"
+      "dest": "/frontend/index.html"
     }
   ]
 }
