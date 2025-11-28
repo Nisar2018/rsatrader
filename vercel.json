@@ -1,14 +1,7 @@
 {
-  "rewrites": [
-   
-    {
-      "source": "/api/(.*)",
-      "destination": "/server.js"
-    },
-   
-    {
-      "source": "/(.*)",
-      "destination": "frontend/build/index.html"
+  "functions": {
+    "server.js": {
+      "runtime": "@vercel/node@20.x"
     }
-  ]
+  }
 }
