@@ -1,6 +1,7 @@
 ﻿const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path'); // <-- THIS IS THE MISSING LINE
 const { connectToDatabase } = require('./config'); // Assuming connection function is in a separate file
 
 const app = express();
@@ -8,6 +9,9 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// 1. Serve Static Files from the frontend/build directory
+app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
 // Import API routes
 const apiRoutes = require('./apiRoutes');
