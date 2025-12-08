@@ -16,7 +16,7 @@ const LoginForm = (onLogin) => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.get('http://api/login', {
+            const response = await axios.get('/api/login', {
                 params: { UserName, Passward, Database}  
             });
             
