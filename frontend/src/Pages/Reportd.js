@@ -40,7 +40,7 @@ const Reportd = () => {
     };
     
     
-    axios.get('http://localhost:5000/reportd', { params })
+    axios.get('/api/reportd', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

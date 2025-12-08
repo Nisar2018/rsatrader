@@ -44,7 +44,7 @@ const StoreLedger = () => {
     };
     
     
-    axios.get('http://localhost:5000/storeLedger', { params })
+    axios.get('/api/storeLedger', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

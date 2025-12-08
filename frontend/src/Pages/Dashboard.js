@@ -39,7 +39,7 @@ const Dashboard = () => {
         dateTo: dateTo ? formatDate(dateTo) : null
     };
     
-    axios.get('http://localhost:5000/dashboard', { params })
+    axios.get('/api/dashboard', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

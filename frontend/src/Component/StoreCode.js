@@ -9,7 +9,7 @@ const StoreCode = ({ onSelectStoreCode }) => {
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/storeCode');
+                const response = await axios.get('/api/storeCode');
                
                 setStoreCode(response.data);
             } catch (error) {

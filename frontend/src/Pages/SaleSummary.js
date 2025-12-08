@@ -49,7 +49,7 @@ const SaleSummary = () => {
     };
     
     
-    axios.get('http://localhost:5000/saleSummary', { params })
+    axios.get('/api/saleSummary', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

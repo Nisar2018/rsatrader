@@ -39,7 +39,7 @@ const AccountBalance = () => {
         dateTo: dateTo ? formatDate(dateTo) : null
     };
     
-    axios.get('http://localhost:5000/accountBalance', { params })
+    axios.get('/api/accountBalance', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

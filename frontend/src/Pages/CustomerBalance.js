@@ -44,7 +44,7 @@ const CustomerBalance = () => {
     };
     
    
-    axios.get('http://localhost:5000/customerBalance', { params })
+    axios.get('/api/customerBalance', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

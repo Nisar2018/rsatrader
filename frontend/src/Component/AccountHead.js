@@ -10,7 +10,7 @@ const AccountHead = ({ onSelectAccountHead }) => {
         const fetchAccounts = async () => {
             try {
                 // Picking data from function accountHead.js
-                const response = await axios.get('http://localhost:5000/accountHead');
+                const response = await axios.get('/api/accountHead');
              
                 setAccountHead(response.data);
             } catch (error) {

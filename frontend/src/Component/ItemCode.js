@@ -9,7 +9,7 @@ const ItemCode = ({ onSelectItemCode }) => {
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/itemCode');
+                const response = await axios.get('/api/itemCode');
                 setItemCode(response.data);
             } catch (error) {
                 console.error('Error fetching account codes and names:', error);

@@ -9,7 +9,7 @@ const ItemType = ({ onSelectitemtype }) => {
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/itemType');
+                const response = await axios.get('/api/itemType');
                
                 setItemtype(response.data);
             } catch (error) {

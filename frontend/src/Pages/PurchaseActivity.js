@@ -46,7 +46,7 @@ const PurchaseActivity = () => {
     };
     
     
-    axios.get('http://localhost:5000/purchaseActivity', { params })
+    axios.get('/api/purchaseActivity', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

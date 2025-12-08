@@ -46,7 +46,7 @@ const CashBook = () => {
     // Log params before making the request
    // console.log("Sending params:", params);
     
-    axios.get('http://localhost:5000/cashBook', { params })
+    axios.get('/api/cashBook', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

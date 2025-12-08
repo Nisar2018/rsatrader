@@ -9,7 +9,7 @@ const BranchCode = ({ onSelectBranchCode }) => {
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/branchCode');
+                const response = await axios.get('/api/branchCode');
                 
                 setBranchCode(response.data);
             } catch (error) {

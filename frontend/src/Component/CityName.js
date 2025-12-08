@@ -9,7 +9,7 @@ const CityName = ({ onSelectCityname }) => {
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/cityName');
+                const response = await axios.get('/api/cityName');
                
                setCityname(response.data);
             } catch (error) {

@@ -52,7 +52,7 @@ const SaleActivity = () => {
     };
     
     
-    axios.get('http://localhost:5000/saleActivity', { params })
+    axios.get('/api/saleActivity', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

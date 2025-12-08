@@ -9,7 +9,7 @@ const Salesman = ({ onSelectSalesman }) => {
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/salesman');
+                const response = await axios.get('/api/salesman');
                
                setSalesman(response.data);
             } catch (error) {
