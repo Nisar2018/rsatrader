@@ -1,14 +1,12 @@
 {
   "rewrites": [
-    
     {
       "source": "/api/(.*)",
       "destination": "/index.js"
     },
-    
     {
       "source": "/(.*)",
-      "destination": "/frontend/build/index.html"
+      "destination": "/index.js"
     }
   ]
 }
