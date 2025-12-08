@@ -14,10 +14,13 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, 'frontend', 'build')));
 
 // Import API routes
-const apiRoutes = require('./apiRoutes');
+//const apiRoutes = require('./apiRoutes');
 
 // Use API routes
-app.use('/api', apiRoutes);
+//app.use('/api', apiRoutes);
+
+app.use("/api", require("./apiRoutes"));
+
 
 // 2. Catch-all: Serve the React index.html for all other routes
 // This MUST be the LAST route defined. It ensures client-side routing works.
