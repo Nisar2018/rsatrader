@@ -9,7 +9,7 @@
     "build-all": "cd frontend && npm install && npm run build"
   },
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   },
   "author": "Nisar Ahmad",
   "license": "ISC",
