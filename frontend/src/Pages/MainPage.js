@@ -12,27 +12,27 @@ export default function Main() {
    
     const handleStoreLedger= async()=>{
     
-        navigate('/StoreLedger')
+        navigate('/storeLedger')
     
     };
      const handleCustomerBalance = async () => {
-        navigate('/CustomerBalance')
+        navigate('/customerBalance')
       }; 
 
       const handleItemSummary= async()=>{
-        navigate('/ItemSummary')
+        navigate('/itemSummary')
       };
 
       const handlePurchaseActivity= async()=>{
-        navigate('/PurchaseActivity')
+        navigate('/purchaseActivity')
       };
 
     
    const handleCashBook= async()=>{
-    navigate('/CashBook')
+    navigate('/cashBook')
    };
     const handleSalesActivity= async()=>{
-        navigate('/SaleActivity')
+        navigate('/saleActivity')
     };
     
     const handleSalesSummary= async()=>{
