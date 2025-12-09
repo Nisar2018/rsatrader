@@ -43,7 +43,7 @@ const ItemSummery = () => {
     };
     
     
-    axios.get('/api/itemSummary', { params })
+    axios.get('/api/itemsummary', { params })
         .then(response => {
             console.log("Response:", response.data);
             setData(response.data);

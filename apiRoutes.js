@@ -65,6 +65,7 @@ router.get('/dashboard', async (req, res) => {
         res.status(500).json({ err: err.message });
     }
 });
+
 // -------------------------------------------------------------------
 // 3. cashBook ROUTE: Original functionality from CashBook.js
 // Path: /cashbook
@@ -131,7 +132,7 @@ router.get('/cityname', async (req, res) => {
 // 5. CustomerBalance ROUTE: Original functionality from customerBalance.js
 // Path: /customerbalance
 // -------------------------------------------------------------------
-router.get('/customerbalance', async (req, res) => {    
+router.get('/customerBalance', async (req, res) => {    
     const { areaname, branchCode, cityname, salesman, dateTo } = req.query;
 
         try {
@@ -252,7 +253,7 @@ router.get('/itemtype', async (req, res) => {
 // 11. purchaseActivity ROUTE: Original functionality from purchaseActivity.js
 // Path: /purchaseactivity
 // -------------------------------------------------------------------
-router.get('/purchaseactivity', async (req, res) => {
+router.get('/purchaseActivity', async (req, res) => {
     
  //   console.log("Received query params:", req.query);
 
@@ -302,7 +303,7 @@ router.get('/purchaseactivity', async (req, res) => {
 // 12. reportd ROUTE: Original functionality from reportd.js
 // Path: /reportd
 // -------------------------------------------------------------------
-router.get('/reportd', async (req, res) => {
+router.get('/Reportd', async (req, res) => {
     
  //   console.log("Received query params:", req.query);
 
@@ -352,7 +353,7 @@ router.get('/reportd', async (req, res) => {
 // 13. saleActivity ROUTE: Original functionality from saleActivity.js
 // Path: /saleactivity
 // -------------------------------------------------------------------
-router.get('/saleactivity', async (req, res) => {
+router.get('/saleActivity', async (req, res) => {
     
  //   console.log("Received query params:", req.query);
 
@@ -421,7 +422,7 @@ router.get('/salesman', async (req, res) => {
 // 15. saleSummary ROUTE: Original functionality from saleSummary.js
 // Path: /salesummary
 // -------------------------------------------------------------------
-router.get('/salesummary', async (req, res) => {
+router.get('/saleSummary', async (req, res) => {
     
  //   console.log("Received query params:", req.query);
 
@@ -487,7 +488,7 @@ router.get('/storecode', async (req, res) => {
 // 17. storeLedger ROUTE: Original functionality from storeLedger.js
 // Path: /storeledger
 // -------------------------------------------------------------------
-router.get('/storeledger', async (req, res) => {
+router.get('/storeLedger', async (req, res) => {
     
     const { itemCode,branchCode,storeCode, dateFrom, dateTo } = req.query;
         try {
@@ -526,7 +527,7 @@ router.get('/storeledger', async (req, res) => {
 // 18. accountBalance ROUTE: Original functionality from accountBalance.js
 // Path: /accountbalance
 // -------------------------------------------------------------------
-router.get('/accountbalance', async (req, res) => {
+router.get('/accountBalance', async (req, res) => {
     
    // console.log("Received query params:", req.query);
 

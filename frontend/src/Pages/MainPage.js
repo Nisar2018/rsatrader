@@ -13,14 +13,13 @@ export default function Main() {
     const handleStoreLedger= async()=>{
     
         navigate('/storeLedger')
-    
     };
      const handleCustomerBalance = async () => {
         navigate('/customerBalance')
       }; 
 
       const handleItemSummary= async()=>{
-        navigate('/itemSummary')
+        navigate('/itemsummary')
       };
 
       const handlePurchaseActivity= async()=>{
