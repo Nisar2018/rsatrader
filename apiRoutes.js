@@ -620,10 +620,6 @@ router.get('/branchcode', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-
-
-
 // Add all other consolidated routes here...
 
 // Export the single consolidated router
