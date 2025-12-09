@@ -7,22 +7,22 @@ const apiRoutes = require("./apiRoutes");
 
 app.use(express.json());
 
-// Define the static directory using path.resolve. This is generally safer
-// for finding files relative to the project root on Vercel.
-const staticPath = path.resolve('frontend', 'build'); 
+// Set the path to the root of the current deployment context.
+// This assumes Vercel has moved the contents of 'frontend/build' here.
+const staticRootPath = path.resolve(); 
 
-// 1. API ROUTING: This must come BEFORE the catch-all
+// 1. API ROUTING: This must come BEFORE the static file serving
 app.use("/api", apiRoutes); 
 
-// 2. STATIC FILE SERVING: Tell Express to serve files from the build directory
+// 2. STATIC FILE SERVING: Tell Express to serve files from the current directory's root
 // This handles requests like /static/js/main.js
-app.use(express.static(staticPath)); 
+app.use(express.static(staticRootPath)); 
 
 // 3. CATCH-ALL ROUTE: For every request that wasn't an API call or a static file, 
-// serve the main index.html file.
+// serve the main index.html file from the root directory.
 app.get('*', (req, res) => {
-    // Send the index.html from the resolved static path location
-    res.sendFile(path.join(staticPath, 'index.html'));
+    // We assume index.html is also in the root of the deployment folder
+    res.sendFile(path.join(staticRootPath, 'index.html'));
 });
 
 module.exports = app;
