@@ -9,7 +9,7 @@ const AccountSelector = ({ onSelectAccount }) => {
     useEffect(() => {
         const fetchAccounts = async () => {
             try {
-                const response = await axios.get('/api/accountCodes');
+                const response = await axios.get('/api/accountcode');
              
                 setAccounts(response.data);
             } catch (error) {
