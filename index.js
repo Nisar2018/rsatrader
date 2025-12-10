@@ -1,4 +1,4 @@
-// index.js (in root directory) - HYBRID SERVER
+// index.js (in root directory) - HYBRID SERVER with Ultimate Path Fix
 
 const express = require("express");
 const path = require("path"); 
@@ -7,16 +7,21 @@ const apiRoutes = require("./apiRoutes");
 
 app.use(express.json());
 
-// 1. API ROUTING: This must come BEFORE the static file serving
+// *******************************************************************
+// FINAL PATH FIX: Use process.cwd() to anchor the path safely
+// *******************************************************************
+// This is the correct build path relative to the project root
+const buildPath = path.join(process.cwd(), 'frontend', 'build'); 
+
+// 1. API ROUTING
 app.use("/api", apiRoutes); 
 
-// 2. STATIC FILE SERVING: Look for static assets in the correct build folder
-// This is the most reliable path structure relative to the project root
-app.use(express.static(path.join(__dirname, 'frontend', 'build'))); 
+// 2. STATIC FILE SERVING: Serve files from the correctly anchored path
+app.use(express.static(buildPath)); 
 
-// 3. CATCH-ALL ROUTE: Serve the main index.html file for all client-side routes (e.g., /login, /dashboard)
+// 3. CATCH-ALL ROUTE: Serve the index.html from the same path
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'frontend', 'build', 'index.html'));
+    res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 module.exports = app;
