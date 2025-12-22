@@ -1,118 +1,55 @@
-
 import { useNavigate } from 'react-router-dom';
 
 export default function Main() {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleReport = () => {
-    
-        navigate('/Reportd');
+  return (
+    <div className="min-h-screen flex items-start justify-center bg-gray-100 px-4">
+      <div className="w-full max-w-3xl bg-white shadow-lg rounded-xl mt-10 p-4 sm:p-6">
 
-    };
-   
-    const handleStoreLedger= async()=>{
-    
-        navigate('/storeLedger')
-    };
-     const handleCustomerBalance = async () => {
-        navigate('/customerBalance')
-      }; 
+        {/* Title */}
+        <h1 className="text-center font-bold mb-6
+                       text-lg sm:text-xl md:text-2xl lg:text-3xl">
+          Trader Reporting Page
+        </h1>
 
-      const handleItemSummary= async()=>{
-        navigate('/itemsummary')
-      };
+        {/* Buttons Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
 
-      const handlePurchaseActivity= async()=>{
-        navigate('/purchaseActivity')
-      };
+          <MenuButton text="General Ledger" onClick={() => navigate('/Reportd')} />
+          <MenuButton text="Account Balance" onClick={() => navigate('/accountBalance')} />
+          <MenuButton text="Store Ledger" onClick={() => navigate('/storeLedger')} />
 
-    
-   const handleCashBook= async()=>{
-    navigate('/cashBook')
-   };
-    const handleSalesActivity= async()=>{
-        navigate('/saleActivity')
-    };
-    
-    const handleSalesSummary= async()=>{
-        navigate('/SaleSummary')
-    };
-    const handleDashboard= async()=>{
-        navigate('/dashboard')
-    };
-    const handleAccountBalance= async()=>{
-        navigate('/accountBalance')
-    };
-    
-    
-    
-    const handleLogout = () => {
-     
-        navigate('/logout');
-    };
-    
+          <MenuButton text="Customer Balance" onClick={() => navigate('/customerBalance')} />
+          <MenuButton text="Item Summary" onClick={() => navigate('/itemsummary')} />
+          <MenuButton text="Sales Activity" onClick={() => navigate('/saleActivity')} />
 
+          <MenuButton text="Purchase Activity" onClick={() => navigate('/purchaseActivity')} />
+          <MenuButton text="Cash Book" onClick={() => navigate('/cashBook')} />
+          <MenuButton text="Sales Summary" onClick={() => navigate('/SaleSummary')} />
 
+          <MenuButton text="Dashboard" onClick={() => navigate('/dashboard')} />
+          <MenuButton text="Logout" danger onClick={() => navigate('/logout')} />
 
-    return (
-        <>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-            <div className="container text-center">
-                <div className="row justify-content-md-center mt-5">
-                    <div className="box col col-md-6 m-auto ">
-                        <h1 className="mb-3 text-center"> Trader Reporting Page</h1>
-                        <div className="row mb-4">
-                            <div className="col col-md-4 mt-4">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleReport} >General Ledger</button>
-                            </div>
-                            <div className="col col-md-4 mt-4">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleAccountBalance} >Account Balance</button>
-                            </div>
-                            <div className="col col-md-4 mt-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleStoreLedger} >Store Ledger</button>
-                            </div>
-                        </div>
-                        <div className="row mb-4">
-                           <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleCustomerBalance} >Customer Balance</button>
-                            </div>
-                            <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleItemSummary} >Item Summary</button>
-                            </div>
-                            <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleSalesActivity} >Sales Activity</button>
-                            </div>
-                        </div>
-                        <div className="row mb-4">
-                           <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handlePurchaseActivity} >Purchase Activity</button>
-                            </div>
-                            <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleCashBook} >Cash Book</button>
-                            </div>
-                            <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleSalesSummary} >Sales Summary </button>
-                            </div>
-                        </div>
-                        <div className="row mb-4">
-                        <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleDashboard} >Dashboard </button>
-                            </div>
-                            <div className="col col-md-4 ">
-                                <button type="button" className="btn btn-primary btn-md " onClick={handleLogout} >Logout</button>
-                            </div>
-                            
-                        </div>
-
-
-
-                    </div>
-
-                </div>
-            </div>
-      
-      </>
-
-    );
-
+/* Reusable Button Component */
+function MenuButton({ text, onClick, danger = false }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`w-full py-3 rounded-lg font-medium transition
+        text-xs sm:text-sm md:text-base
+        ${danger
+          ? 'bg-red-600 hover:bg-red-700 text-white'
+          : 'bg-blue-600 hover:bg-blue-700 text-white'
+        }`}
+    >
+      {text}
+    </button>
+  );
 }

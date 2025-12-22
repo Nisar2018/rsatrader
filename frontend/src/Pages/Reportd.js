@@ -1,129 +1,152 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Table from 'react-bootstrap/Table';
+
 import AccountSelector from '../Component/AccountSelector';
 import ReportDate from '../Component/ReportDate';
 
-
 const Reportd = () => {
-    const [data, setData] = useState([]);
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
-    const [accountNumber, setAccountNumber] = useState('');
-    const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [accountNumber, setAccountNumber] = useState('');
 
-    const formatDate = (date) => {
-               
-        if (!date) return null;
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return null; // Ensure valid date   
-       
-        let month = '' + (d.getMonth() + 1);
-        let day = '' + d.getDate();
-        const year = d.getFullYear();
+  const navigate = useNavigate();
 
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
+  const formatDate = (date) => {
+    if (!date) return null;
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return null;
 
-        return [year, month, day].join('-');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${year}-${month}-${day}`;
+  };
+
+  const fetchData = () => {
+    const params = {
+      accountNumber,
+      dateFrom: dateFrom ? formatDate(dateFrom) : null,
+      dateTo: dateTo ? formatDate(dateTo) : null,
     };
 
-    const fetchData = async () => {
-        
-        
-       const params = {
-        accountNumber,
-        dateFrom: dateFrom ? formatDate(dateFrom) : null,
-        dateTo: dateTo ? formatDate(dateTo) : null
-    };
-    
-    
-    axios.get('/api/Reportd', { params })
-        .then(response => {
-            console.log("Response:", response.data);
-            setData(response.data);
-        })
-        .catch(error => {
-            console.error("Error fetching report:", error);
-        });
-    };
+    axios
+      .get('/api/Reportd', { params })
+      .then((res) => setData(res.data))
+      .catch((err) => console.error('Error fetching report:', err));
+  };
 
-    const handleSearch = () => {
-        fetchData();
-    };
+  const totalDebit = data.reduce(
+    (sum, item) => sum + (item.DebitAmount || 0),
+    0
+  );
+  const totalCredit = data.reduce(
+    (sum, item) => sum + (item.CreditAmount || 0),
+    0
+  );
 
-    useEffect(() => {
-      //  fetchData();
-    },[]);
+  return (
+    <div className="max-w-7xl mx-auto bg-sky-100 mt-4 mb-6 p-4 rounded-lg">
 
-    const handleMainPage = () => {
-        
-        navigate('/MainPage');
-    };
+      {/* Title */}
+      <h2 className="text-center font-bold mb-6
+                     text-lg sm:text-xl md:text-2xl lg:text-3xl">
+        Account Ledger Report
+      </h2>
 
-    // Calculate totals for debit and credit amounts
-    const totalDebit = data.reduce((acc, item) => acc + (item.DebitAmount || 0), 0);
-    const totalCredit = data.reduce((acc, item) => acc + (item.CreditAmount || 0), 0);
+      {/* Filters */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <AccountSelector onSelectAccount={setAccountNumber} />
+        <ReportDate
+          dateFrom={dateFrom}
+          setDateFrom={setDateFrom}
+          dateTo={dateTo}
+          setDateTo={setDateTo}
+        />
+      </div>
 
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-3 mb-4">
+        <button
+          onClick={fetchData}
+          className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white
+                     text-xs sm:text-sm md:text-base transition"
+        >
+          Search
+        </button>
 
-    return (
-        <div className="container-sm bg-info mb-3 mt-3">
-            <div className="row ">
-                <h2 className="text-center mt-4">Account Ledger Report</h2>
-            </div>
+        <button
+          onClick={() => navigate('/MainPage')}
+          className="px-6 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white
+                     text-xs sm:text-sm md:text-base transition"
+        >
+          Main Page
+        </button>
+      </div>
 
-            {/* Using AccountSelector Component */}
-            <AccountSelector onSelectAccount={setAccountNumber} />
-            
-            {/* Using ReportDate Component */}
-            <ReportDate dateFrom={dateFrom} setDateFrom={setDateFrom} dateTo={dateTo} setDateTo={setDateTo} />
-          
-            <button type="button" className="btn btn-primary mb-3" onClick={handleSearch}>Search</button>
-            <button type="button" className="btn btn-primary mb-3" onClick={handleMainPage}>Main Page</button>
-            <Table responsive striped bordered>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>V No</th>
-                        <th>V Type</th>
-                        <th>Sr No</th>
-                        <th>Desc</th>
-                        <th>Debit Amount</th>
-                        <th>Credit Amount</th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((item, index) => (
-                        <tr key={index}>
-                            <td >{formatDate(item.EntryDate)}</td>
-                            <td>{item.voucherno}</td>
-                            <td>{item.Vouchertype}</td>
-                            <td>{item.SerialNo}</td>
-                            <td>{item.Remarks}</td>
-                            <td>{item.DebitAmount}</td>
-                            <td>{item.CreditAmount}</td> 
-                        </tr>
-                    ))}
-                    <tr>
-                        <td colSpan="5"><strong>Totals</strong></td>
-                        <td><strong>{totalDebit}</strong></td>
-                        <td><strong>{totalCredit}</strong></td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colSpan="5"><strong>Balance</strong></td>
-                        <td></td>
-                        <td><strong>{totalDebit-totalCredit}</strong></td>
-                        
-                        <td></td>
-                    </tr>
-                </tbody>
-            </Table>
-        </div>
-    );
+      {/* Table */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full border border-gray-300 text-xs sm:text-sm md:text-base">
+          <thead className="bg-gray-200">
+            <tr>
+              {[
+                'Date',
+                'V No',
+                'V Type',
+                'Sr No',
+                'Description',
+                'Debit Amount',
+                'Credit Amount',
+              ].map((head) => (
+                <th
+                  key={head}
+                  className="border px-3 py-2 text-left font-semibold"
+                >
+                  {head}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          <tbody>
+            {data.map((item, index) => (
+              <tr key={index} className="odd:bg-white even:bg-gray-50">
+                <td className="border px-3 py-1">
+                  {formatDate(item.EntryDate)}
+                </td>
+                <td className="border px-3 py-1">{item.voucherno}</td>
+                <td className="border px-3 py-1">{item.Vouchertype}</td>
+                <td className="border px-3 py-1">{item.SerialNo}</td>
+                <td className="border px-3 py-1">{item.Remarks}</td>
+                <td className="border px-3 py-1">{item.DebitAmount}</td>
+                <td className="border px-3 py-1">{item.CreditAmount}</td>
+              </tr>
+            ))}
+
+            {/* Totals */}
+            <tr className="font-semibold bg-gray-100">
+              <td colSpan={5} className="border px-3 py-2 text-right">
+                Totals
+              </td>
+              <td className="border px-3 py-2">{totalDebit}</td>
+              <td className="border px-3 py-2">{totalCredit}</td>
+            </tr>
+
+            {/* Balance */}
+            <tr className="font-semibold bg-gray-200">
+              <td colSpan={6} className="border px-3 py-2 text-right">
+                Balance
+              </td>
+              <td className="border px-3 py-2">
+                {totalDebit - totalCredit}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 export default Reportd;

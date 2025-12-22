@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Table from 'react-bootstrap/Table';
+
 import ReportDate from '../Component/ReportDate';
 import ItemType from '../Component/ItemType';
 import ItemCompany from '../Component/ItemCompany';
@@ -24,134 +23,114 @@ const SaleSummary = () => {
     const navigate = useNavigate();
 
     const formatDate = (date) => {
-               
         if (!date) return null;
         const d = new Date(date);
-        if (isNaN(d.getTime())) return null; // Ensure valid date   
-       
-        let month = '' + (d.getMonth() + 1);
-        let day = '' + d.getDate();
-        const year = d.getFullYear();
-
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
-
-        return [year, month, day].join('-');
+        if (isNaN(d.getTime())) return null;
+        return d.toISOString().split('T')[0];
     };
 
-    const fetchData = async () => {
-        
-        
-       const params = {
-        cityName, itemType, itemCompany, branchCode, areaName, salesman,
-        dateFrom: dateFrom ? formatDate(dateFrom) : null,
-        dateTo: dateTo ? formatDate(dateTo) : null
-    };
-    
-    
-    axios.get('/api/saleSummary', { params })
-        .then(response => {
-            console.log("Response:", response.data);
-            setData(response.data);
-        })
-        .catch(error => {
-            console.error("Error fetching report:", error);
-        });
+    const fetchData = () => {
+        const params = {
+            cityName,
+            itemType,
+            itemCompany,
+            branchCode,
+            areaName,
+            salesman,
+            dateFrom: dateFrom ? formatDate(dateFrom) : null,
+            dateTo: dateTo ? formatDate(dateTo) : null
+        };
+
+        axios.get('/api/saleSummary', { params })
+            .then(res => setData(res.data))
+            .catch(err => console.error(err));
     };
 
-    const handleSearch = () => {
-        fetchData();
-    };
-
-    useEffect(() => {
-     
-    },[]);
-
-    const handleMainPage = () => {
-        
-        navigate('/MainPage');
-    };
-
-   
     return (
-        <div className="container-sm bg-info mb-3 mt-3">
-            <div className="row ">
-                <h2 className="text-center mt-4">Sale Summary Report</h2>
-            </div>
-            <div className='row'>
-                
-                <div className='col'>
-                    {/* Using AccountSelector Component */}
-                    <CityName onSelectCityname={setCityName} />
-                </div>
-                <div className='col'>
-                    {/* Using BranchCode Component */}
-                    <BranchCode onSelectBranchCode={setBranchCode} />
-                    
-                </div>
-                <div className='col'>
-                    
-                    {/* Using AreaName Component */}
-                    <AreaName onSelectAreaname={setAreaName} />
-                 </div> 
-            </div>
-            <div className='row'>  
-                
-                <div className='col'>
-                    {/* Using Item Type Component */}
-                    <ItemType onSelectitemtype={setItemType} />
-                </div>
-                
-                <div className='col'>
-                    
-                    {/* Using Itemcompany Component */}
-                    <ItemCompany onSelectitemcompany={setItemCompany} />
-                    
-                </div>
-                <div className='col'>
-                    
-                    {/* Using Saleman Component */}
-                    <Salesman onSelectSalesman={setSalesman} />
-                    
-                </div>
-            </div>
-           
-                        
-            {/* Using ReportDate Component */}
-            <ReportDate dateFrom={dateFrom} setDateFrom={setDateFrom} dateTo={dateTo} setDateTo={setDateTo} />
+        <div className="max-w-7xl mx-auto bg-sky-100 rounded-lg p-4 mt-4 text-xs sm:text-sm md:text-base">
 
-            <button type="button" className="btn btn-primary mb-3" onClick={handleSearch}>Search</button>
-            <button type="button" className="btn btn-primary mb-3" onClick={handleMainPage}>Main Page</button>
-            <Table responsive striped bordered>
-                <thead>
-                    <tr>
-                        
-                        <th>Item code</th>
-                        <th>Item Name</th>
-                        <th>Quantity</th>
-                        <th>Purchaser Rate</th>
-                        <th>Gross Amount</th>
-                        <th>Discount Amount</th>
-                        <th>Net Amount</th>
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((item, index) => (
-                        <tr key={index}>
-                            <td>{item.itemcode}</td>
-                            <td>{item.itemname}</td>
-                            <td>{item.quantity}</td>
-                            <td>{item.purchaserate}</td> 
-                            <td>{item.grossamount}</td> 
-                            <td>{item.discountamount}</td> 
-                            <td>{item.netamount}</td> 
+            {/* Title */}
+            <h2 className="text-center font-bold text-base sm:text-lg md:text-xl mb-4">
+                Sale Summary Report
+            </h2>
 
+            {/* Filters Row 1 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                <CityName onSelectCityname={setCityName} />
+                <BranchCode onSelectBranchCode={setBranchCode} />
+                <AreaName onSelectAreaname={setAreaName} />
+            </div>
+
+            {/* Filters Row 2 */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                <ItemType onSelectitemtype={setItemType} />
+                <ItemCompany onSelectitemcompany={setItemCompany} />
+                <Salesman onSelectSalesman={setSalesman} />
+            </div>
+
+            {/* Date */}
+            <div className="mt-4">
+                <ReportDate
+                    dateFrom={dateFrom}
+                    setDateFrom={setDateFrom}
+                    dateTo={dateTo}
+                    setDateTo={setDateTo}
+                />
+            </div>
+
+            {/* Buttons */}
+            <div className="flex flex-wrap gap-3 mt-4">
+                <button
+                    onClick={fetchData}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs sm:text-sm"
+                >
+                    Search
+                </button>
+
+                <button
+                    onClick={() => navigate('/MainPage')}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-xs sm:text-sm"
+                >
+                    Main Page
+                </button>
+            </div>
+
+            {/* Table */}
+            <div className="overflow-x-auto mt-5">
+                <table className="w-full border border-gray-300 text-left text-xs sm:text-sm">
+                    <thead className="bg-gray-200">
+                        <tr>
+                            {[
+                                'Item Code',
+                                'Item Name',
+                                'Quantity',
+                                'Purchase Rate',
+                                'Gross Amount',
+                                'Discount Amount',
+                                'Net Amount'
+                            ].map((head) => (
+                                <th key={head} className="border px-2 py-1 whitespace-nowrap">
+                                    {head}
+                                </th>
+                            ))}
                         </tr>
-                    ))}
-                
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {data.map((item, index) => (
+                            <tr key={index} className="hover:bg-gray-100">
+                                <td className="border px-2 py-1">{item.itemcode}</td>
+                                <td className="border px-2 py-1">{item.itemname}</td>
+                                <td className="border px-2 py-1">{item.quantity}</td>
+                                <td className="border px-2 py-1">{item.purchaserate}</td>
+                                <td className="border px-2 py-1">{item.grossamount}</td>
+                                <td className="border px-2 py-1">{item.discountamount}</td>
+                                <td className="border px-2 py-1">{item.netamount}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+
         </div>
     );
 };

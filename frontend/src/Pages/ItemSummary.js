@@ -1,134 +1,138 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Table from 'react-bootstrap/Table';
+
 import ItemType from '../Component/ItemType';
 import BranchCode from '../Component/BranchCode';
 import DateS from '../Component/DateS';
-import StoreCode  from '../Component/StoreCode';
+import StoreCode from '../Component/StoreCode';
 import ItemCompany from '../Component/ItemCompany';
 
 const ItemSummery = () => {
-    const [data, setData] = useState([]);
-    const [dateTo, setDateTo] = useState('');
-    const [itemtype, setItemtype] = useState('');
-    const [itemcompany, setItemcompany] = useState('');
-    const [branchCode, setBranchCode] = useState('');
-    const [storecode, setstorecode] = useState('');
-    const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [dateTo, setDateTo] = useState('');
+  const [itemtype, setItemtype] = useState('');
+  const [itemcompany, setItemcompany] = useState('');
+  const [branchCode, setBranchCode] = useState('');
+  const [storecode, setstorecode] = useState('');
 
-    const formatDate = (date) => {
-               
-        if (!date) return null;
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return null; // Ensure valid date   
-       
-        let month = '' + (d.getMonth() + 1);
-        let day = '' + d.getDate();
-        const year = d.getFullYear();
+  const navigate = useNavigate();
 
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
+  const formatDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().split('T')[0];
+  };
 
-        return [year, month, day].join('-');
+  const fetchData = async () => {
+    const params = {
+      itemtype,
+      branchCode,
+      itemcompany,
+      storecode,
+      dateTo: dateTo ? formatDate(dateTo) : null,
     };
 
-    const fetchData = async () => {
-        
-        
-       const params = {
-        itemtype, branchCode, itemcompany, storecode,
-        dateTo: dateTo ? formatDate(dateTo) : null
-    };
-    
-    
-    axios.get('/api/itemsummary', { params })
-        .then(response => {
-            console.log("Response:", response.data);
-            setData(response.data);
-        })
-        .catch(error => {
-            console.error("Error fetching report:", error);
-        });
-    };
+    try {
+      const response = await axios.get('/api/itemsummary', { params });
+      setData(response.data);
+    } catch (error) {
+      console.error('Error fetching report:', error);
+    }
+  };
 
-    const handleSearch = () => {
-        fetchData();
-    };
+  const handleSearch = () => fetchData();
+  const handleMainPage = () => navigate('/MainPage');
 
-    useEffect(() => {
-     
-    },[]);
+  useEffect(() => {}, []);
 
-    const handleMainPage = () => {
-        
-        navigate('/MainPage');
-    };
+  return (
+    <div className="max-w-6xl mx-auto bg-blue-100 mt-4 p-4 sm:p-6 rounded-lg">
 
-    return (
-        <div className="container-sm bg-info mb-3 mt-3">
-            <div className="row ">
-                <h2 className="text-center mt-4">Item Summary Report</h2>
-            </div>
-            <div className='row'>
-                <div className='col'>
-                    {/* Using Item Type Component */}
-                    <ItemType onSelectitemtype={setItemtype} />
-                </div>
-                <div className='col'>
-                    
-                    {/* Using Itemcompany Component */}
-                    <ItemCompany onSelectitemcompany={setItemcompany} />
-                    
-                </div>
-                <div className='col'>
-                    {/* Using BranchCode Component */}
-                    <BranchCode onSelectBranchCode={setBranchCode} />
-                </div>
-                <div className='col'>
-                    {/* Using Salesman Component */}
-                    <StoreCode onSelectStoreCode={setstorecode} />
-                </div>
-            
-            </div>
-            <div className='row'>
-                <div className='col'>
-                    {/* Using ReportDate Component */}
-                    <DateS dateTo={dateTo} setDateTo={setDateTo} />    
-                </div> 
-                   
-            </div>     
-                       
-            <button type="button" className="btn btn-primary mb-3" onClick={handleSearch}>Search</button>
-            <button type="button" className="btn btn-primary mb-3" onClick={handleMainPage}>Main Page</button>      
-            <Table responsive striped bordered>
-                <thead>
-                    <tr>
-                        <th>Item Code</th>
-                        <th>Item Name</th>
-                        <th>Quantity In</th>
-                        <th>Quantity Out</th>
-                        <th>Balance</th>
-                        
-                        
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((item, index) => (
-                        <tr key={index}>
-                           
-                            <td>{item.itemcode}</td>
-                            <td>{item.itemname}</td>
-                            <td>{item.quantityin}</td>
-                            <td>{item.quantityout}</td>
-                            <td>{item.balancequantity}</td> 
-                        </tr>
-                    ))}
-                </tbody>
-            </Table>
-        </div>
-    );
+      {/* Title */}
+      <h2 className="text-center font-bold text-lg sm:text-xl md:text-2xl mb-6">
+        Item Summary Report
+      </h2>
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+        <ItemType onSelectitemtype={setItemtype} />
+        <ItemCompany onSelectitemcompany={setItemcompany} />
+        <BranchCode onSelectBranchCode={setBranchCode} />
+        <StoreCode onSelectStoreCode={setstorecode} />
+      </div>
+
+      {/* Date */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 mb-4">
+        <DateS dateTo={dateTo} setDateTo={setDateTo} />
+      </div>
+
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-3 mb-6">
+        <button
+          onClick={handleSearch}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-xs sm:text-sm md:text-base transition"
+        >
+          Search
+        </button>
+
+        <button
+          onClick={handleMainPage}
+          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-xs sm:text-sm md:text-base transition"
+        >
+          Main Page
+        </button>
+      </div>
+
+      {/* Table */}
+      <div className="overflow-x-auto bg-white rounded-lg shadow">
+        <table className="w-full border border-gray-200 text-xs sm:text-sm md:text-base">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border px-3 py-2 text-left">Item Code</th>
+              <th className="border px-3 py-2 text-left">Item Name</th>
+              <th className="border px-3 py-2 text-right">Quantity In</th>
+              <th className="border px-3 py-2 text-right">Quantity Out</th>
+              <th className="border px-3 py-2 text-right">Balance</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {data.length === 0 ? (
+              <tr>
+                <td
+                  colSpan="5"
+                  className="text-center py-4 text-gray-500 text-sm"
+                >
+                  No data found
+                </td>
+              </tr>
+            ) : (
+              data.map((item, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-50 transition"
+                >
+                  <td className="border px-3 py-2">{item.itemcode}</td>
+                  <td className="border px-3 py-2">{item.itemname}</td>
+                  <td className="border px-3 py-2 text-right">
+                    {item.quantityin}
+                  </td>
+                  <td className="border px-3 py-2 text-right">
+                    {item.quantityout}
+                  </td>
+                  <td className="border px-3 py-2 text-right">
+                    {item.balancequantity}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 };
 
 export default ItemSummery;
