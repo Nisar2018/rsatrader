@@ -17,107 +17,147 @@ const StoreLedger = () => {
     const navigate = useNavigate();
 
     const formatDate = (date) => {
-        if (!date) return null;
+        if (!date) return '';
         const d = new Date(date);
-        if (isNaN(d.getTime())) return null;
-        let month = '' + (d.getMonth() + 1);
-        let day = '' + d.getDate();
-        const year = d.getFullYear();
-        if (month.length < 2) month = '0' + month;
-        if (day.length < 2) day = '0' + day;
-        return [year, month, day].join('-');
+        return d.toISOString().split('T')[0];
     };
 
-    const fetchData = async () => {
-        const params = {
-            itemCode, branchCode, storeCode,
-            dateFrom: dateFrom ? formatDate(dateFrom) : null,
-            dateTo: dateTo ? formatDate(dateTo) : null
-        };
-
-        axios.get('/api/storeLedger', { params })
-            .then(response => {
-                setData(response.data);
-            })
-            .catch(error => {
-                console.error("Error fetching report:", error);
-            });
+    const fetchData = () => {
+        axios.get('/api/storeLedger', {
+            params: {
+                itemCode,
+                branchCode,
+                storeCode,
+                dateFrom: dateFrom ? formatDate(dateFrom) : null,
+                dateTo: dateTo ? formatDate(dateTo) : null,
+            }
+        })
+        .then(res => setData(res.data))
+        .catch(err => console.error(err));
     };
 
-    const handleSearch = () => fetchData();
-    const handleMainPage = () => navigate('/MainPage');
-
-    const totalDebit = data.reduce((acc, item) => acc + (item.quantityin || 0), 0);
-    const totalCredit = data.reduce((acc, item) => acc + (item.quantityout || 0), 0);
+    const totalDebit = data.reduce((a, b) => a + (b.quantityin || 0), 0);
+    const totalCredit = data.reduce((a, b) => a + (b.quantityout || 0), 0);
 
     return (
-        <div className="max-w-7xl mx-auto p-4 bg-blue-100 rounded-lg mt-4 mb-4">
-            <h2 className="text-center text-2xl sm:text-xl md:text-3xl font-semibold mb-6">Store Ledger Report</h2>
+        <div className="max-w-7xl mx-auto p-3 sm:p-4 bg-blue-100 rounded-lg mt-4 mb-4">
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+            {/* Title */}
+            <h2 className="text-center font-semibold text-base sm:text-xl md:text-2xl mb-4">
+                Store Ledger Report
+            </h2>
+
+            {/* Filters */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-4">
                 <ItemCode onSelectItemCode={setItemCode} />
                 <BranchCode onSelectBranchCode={setBranchCode} />
                 <StoreCode onSelectStoreCode={setStoreCode} />
             </div>
 
+            {/* Dates */}
             <div className="mb-4">
-                <ReportDate 
-                    dateFrom={dateFrom} setDateFrom={setDateFrom} 
-                    dateTo={dateTo} setDateTo={setDateTo} 
+                <ReportDate
+                    dateFrom={dateFrom}
+                    setDateFrom={setDateFrom}
+                    dateTo={dateTo}
+                    setDateTo={setDateTo}
                 />
             </div>
 
+            {/* Buttons */}
             <div className="flex flex-wrap gap-2 mb-4">
-                <button 
-                    onClick={handleSearch} 
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition text-sm sm:text-base"
+                <button
+                    onClick={fetchData}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs sm:text-sm"
                 >
                     Search
                 </button>
-                <button 
-                    onClick={handleMainPage} 
-                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition text-sm sm:text-base"
+                <button
+                    onClick={() => navigate('/MainPage')}
+                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-xs sm:text-sm"
                 >
                     Main Page
                 </button>
             </div>
 
-            <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-300 text-sm sm:text-base md:text-lg">
-                    <thead className="bg-blue-200">
+            {/* Responsive Table */}
+            <div className="overflow-x-auto rounded-lg border border-gray-300 bg-white">
+                <table className="min-w-[700px] w-full text-xs sm:text-sm">
+                    <thead className="bg-blue-200 sticky top-0 z-10">
                         <tr>
-                            <th className="border px-2 py-1">Date</th>
-                            <th className="border px-2 py-1">V No</th>
-                            <th className="border px-2 py-1">V Type</th>
-                            <th className="border px-2 py-1">Sr No</th>
-                            <th className="border px-2 py-1">Quantity In</th>
-                            <th className="border px-2 py-1">Quantity Out</th>
+                            {[
+                                'Date',
+                                'V No',
+                                'V Type',
+                                'Sr No',
+                                'Qty In',
+                                'Qty Out'
+                            ].map(h => (
+                                <th
+                                    key={h}
+                                    className="border px-2 py-2 text-left whitespace-nowrap"
+                                >
+                                    {h}
+                                </th>
+                            ))}
                         </tr>
                     </thead>
+
                     <tbody>
-                        {data.map((item, index) => (
-                            <tr key={index} className="hover:bg-blue-50">
-                                <td className="border px-2 py-1">{formatDate(item.entrydate)}</td>
-                                <td className="border px-2 py-1">{item.voucherno}</td>
-                                <td className="border px-2 py-1">{item.vouchertype}</td>
-                                <td className="border px-2 py-1">{item.serialno}</td>
-                                <td className="border px-2 py-1">{item.quantityin}</td>
-                                <td className="border px-2 py-1">{item.quantityout}</td>
+                        {data.map((item, i) => (
+                            <tr key={i} className="hover:bg-blue-50">
+                                <td className="border px-2 py-1 whitespace-nowrap">
+                                    {formatDate(item.entrydate)}
+                                </td>
+                                <td className="border px-2 py-1 whitespace-nowrap">
+                                    {item.voucherno}
+                                </td>
+                                <td className="border px-2 py-1 whitespace-nowrap">
+                                    {item.vouchertype}
+                                </td>
+                                <td className="border px-2 py-1 whitespace-nowrap">
+                                    {item.serialno}
+                                </td>
+                                <td className="border px-2 py-1 text-right">
+                                    {item.quantityin}
+                                </td>
+                                <td className="border px-2 py-1 text-right">
+                                    {item.quantityout}
+                                </td>
                             </tr>
                         ))}
+
+                        {/* Totals */}
                         <tr className="font-semibold bg-blue-50">
-                            <td colSpan="4" className="border px-2 py-1">Totals</td>
-                            <td className="border px-2 py-1">{totalDebit}</td>
-                            <td className="border px-2 py-1">{totalCredit}</td>
+                            <td colSpan="4" className="border px-2 py-1">
+                                Totals
+                            </td>
+                            <td className="border px-2 py-1 text-right">
+                                {totalDebit}
+                            </td>
+                            <td className="border px-2 py-1 text-right">
+                                {totalCredit}
+                            </td>
                         </tr>
+
+                        {/* Balance */}
                         <tr className="font-semibold bg-blue-50">
-                            <td colSpan="4" className="border px-2 py-1">Balance</td>
-                            <td className="border px-2 py-1"></td>
-                            <td className="border px-2 py-1">{totalDebit - totalCredit}</td>
+                            <td colSpan="5" className="border px-2 py-1">
+                                Balance
+                            </td>
+                            <td className="border px-2 py-1 text-right">
+                                {totalDebit - totalCredit}
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+
+            {/* Mobile hint */}
+            <p className="text-xs text-gray-600 mt-2 sm:hidden">
+                👉 Swipe left/right to view full table
+            </p>
+
         </div>
     );
 };

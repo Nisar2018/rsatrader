@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,39 +16,43 @@ const Dashboard = () => {
   const formatDate = (date) => {
     if (!date) return '';
     const d = new Date(date);
-    if (isNaN(d.getTime())) return '';
+    if (isNaN(d)) return '';
     return d.toISOString().split('T')[0];
   };
 
   const fetchData = async () => {
-    const params = {
-      branchCode,
-      dateFrom: dateFrom ? formatDate(dateFrom) : null,
-      dateTo: dateTo ? formatDate(dateTo) : null,
-    };
-
     try {
-      const response = await axios.get('/api/dashboard', { params });
-      setData(response.data);
-    } catch (error) {
-      console.error('Error fetching report:', error);
+      const res = await axios.get('/api/dashboard', {
+        params: {
+          branchCode,
+          dateFrom: dateFrom ? formatDate(dateFrom) : null,
+          dateTo: dateTo ? formatDate(dateTo) : null,
+        },
+      });
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
     }
   };
 
-  const handleSearch = () => fetchData();
-  const handleMainPage = () => navigate('/MainPage');
+  const summary = data[0] || {};
 
-  useEffect(() => {}, []);
-
-  const rowStyle = "border px-3 py-2";
-  const labelStyle =
-    "font-semibold text-xs sm:text-sm md:text-base bg-gray-100";
+  const items = [
+    { label: 'Sale Net Amount', value: summary.salenetamount },
+    { label: 'Purchase Net Amount', value: summary.purchasenetamount },
+    { label: 'Sale Return Net Amount', value: summary.salereturnnetamount },
+    { label: 'Purchase Return Net Amount', value: summary.purchasereturnnetamount },
+    { label: 'Receipts', value: summary.receipts },
+    { label: 'Payments', value: summary.payments },
+    { label: 'Cash In Hand', value: summary.cashinhand },
+    { label: 'Expense', value: summary.Expence },
+  ];
 
   return (
-    <div className="max-w-4xl mx-auto bg-blue-100 p-4 sm:p-6 mt-4 rounded-lg">
+    <div className="max-w-4xl mx-auto bg-blue-100 p-3 sm:p-6 mt-4 rounded-lg">
 
       {/* Title */}
-      <h2 className="text-center font-bold text-lg sm:text-xl md:text-2xl mb-6">
+      <h2 className="text-center font-bold text-lg sm:text-2xl mb-6">
         Dashboard
       </h2>
 
@@ -70,61 +74,55 @@ const Dashboard = () => {
       {/* Buttons */}
       <div className="flex flex-wrap gap-3 mb-6">
         <button
-          onClick={handleSearch}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-xs sm:text-sm md:text-base transition"
+          onClick={fetchData}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
         >
           Search
         </button>
 
         <button
-          onClick={handleMainPage}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-xs sm:text-sm md:text-base transition"
+          onClick={() => navigate('/MainPage')}
+          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm"
         >
           Main Page
         </button>
       </div>
 
-      {/* Summary Table */}
-      <div className="overflow-x-auto bg-white rounded-lg shadow">
-        <table className="w-full border border-gray-200 text-xs sm:text-sm md:text-base">
+      {/* ================= MOBILE VIEW (CARDS) ================= */}
+      <div className="space-y-3 sm:hidden">
+        {items.map((item) => (
+          <div
+            key={item.label}
+            className="bg-white rounded-lg shadow p-3 flex justify-between"
+          >
+            <span className="text-xs font-semibold text-gray-600">
+              {item.label}
+            </span>
+            <span className="text-sm font-bold text-gray-800">
+              {item.value ?? 0}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* ================= DESKTOP VIEW (TABLE) ================= */}
+      <div className="hidden sm:block overflow-x-auto bg-white rounded-lg shadow">
+        <table className="w-full border border-gray-200 text-sm">
           <tbody>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>Sale Net Amount</th>
-              <td className={rowStyle}>{data[0]?.salenetamount}</td>
-            </tr>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>Purchase Net Amount</th>
-              <td className={rowStyle}>{data[0]?.purchasenetamount}</td>
-            </tr>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>Sale Return Net Amount</th>
-              <td className={rowStyle}>{data[0]?.salereturnnetamount}</td>
-            </tr>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>
-                Purchase Return Net Amount
-              </th>
-              <td className={rowStyle}>{data[0]?.purchasereturnnetamount}</td>
-            </tr>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>Receipts</th>
-              <td className={rowStyle}>{data[0]?.receipts}</td>
-            </tr>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>Payments</th>
-              <td className={rowStyle}>{data[0]?.payments}</td>
-            </tr>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>Cash In Hand</th>
-              <td className={rowStyle}>{data[0]?.cashinhand}</td>
-            </tr>
-            <tr>
-              <th className={`${rowStyle} ${labelStyle}`}>Expense</th>
-              <td className={rowStyle}>{data[0]?.Expence}</td>
-            </tr>
+            {items.map((item) => (
+              <tr key={item.label} className="even:bg-gray-50">
+                <th className="border px-4 py-2 text-left font-semibold bg-gray-100">
+                  {item.label}
+                </th>
+                <td className="border px-4 py-2 text-right">
+                  {item.value ?? 0}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
+
     </div>
   );
 };

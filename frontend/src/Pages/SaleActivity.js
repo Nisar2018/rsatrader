@@ -26,40 +26,38 @@ const SaleActivity = () => {
   const navigate = useNavigate();
 
   const formatDate = (date) => {
-    if (!date) return null;
+    if (!date) return '';
     const d = new Date(date);
-    if (isNaN(d.getTime())) return null;
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-      2,
-      '0'
-    )}-${String(d.getDate()).padStart(2, '0')}`;
+    if (isNaN(d)) return '';
+    return d.toISOString().split('T')[0];
   };
 
-  const fetchData = () => {
-    const params = {
-      accountNumber,
-      itemType,
-      itemCompany,
-      branchCode,
-      areaName,
-      cityName,
-      salesman,
-      dateFrom: dateFrom ? formatDate(dateFrom) : null,
-      dateTo: dateTo ? formatDate(dateTo) : null,
-    };
-
-    axios
-      .get('/api/saleActivity', { params })
-      .then((res) => setData(res.data))
-      .catch((err) => console.error('Error fetching report:', err));
+  const fetchData = async () => {
+    try {
+      const res = await axios.get('/api/saleActivity', {
+        params: {
+          accountNumber,
+          itemType,
+          itemCompany,
+          branchCode,
+          areaName,
+          cityName,
+          salesman,
+          dateFrom: dateFrom ? formatDate(dateFrom) : null,
+          dateTo: dateTo ? formatDate(dateTo) : null,
+        },
+      });
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto bg-sky-100 mt-4 mb-6 p-4 rounded-lg">
+    <div className="max-w-7xl mx-auto bg-sky-100 mt-4 mb-6 p-3 sm:p-4 rounded-lg">
 
       {/* Title */}
-      <h2 className="text-center font-bold mb-6
-                     text-lg sm:text-xl md:text-2xl lg:text-3xl">
+      <h2 className="text-center font-bold mb-6 text-lg sm:text-2xl">
         Sale Activity Report
       </h2>
 
@@ -92,45 +90,42 @@ const SaleActivity = () => {
       <div className="flex flex-wrap gap-3 mb-4">
         <button
           onClick={fetchData}
-          className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md
-                     text-xs sm:text-sm md:text-base transition"
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
         >
           Search
         </button>
 
         <button
           onClick={() => navigate('/MainPage')}
-          className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md
-                     text-xs sm:text-sm md:text-base transition"
+          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-md text-sm"
         >
           Main Page
         </button>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-300
-                          text-xs sm:text-sm md:text-base">
-          <thead className="bg-gray-200">
+      {/* ================= TABLE ================= */}
+      <div className="relative overflow-x-auto bg-white rounded-lg shadow">
+        <table className="min-w-[1200px] w-full border-collapse text-xs sm:text-sm">
+          <thead className="bg-gray-200 sticky top-0 z-10">
             <tr>
               {[
                 'Date',
                 'V No',
-                'Vendor Name',
-                'Sr No',
+                'Vendor',
+                'Sr',
                 'Item Code',
                 'Item Name',
                 'Qty',
                 'Rate',
                 'Gross',
-                'Discount',
+                'Disc',
                 'Net',
-              ].map((head) => (
+              ].map((h) => (
                 <th
-                  key={head}
-                  className="border px-3 py-2 text-left font-semibold"
+                  key={h}
+                  className="border px-2 py-2 text-left whitespace-nowrap"
                 >
-                  {head}
+                  {h}
                 </th>
               ))}
             </tr>
@@ -138,25 +133,44 @@ const SaleActivity = () => {
 
           <tbody>
             {data.map((item, index) => (
-              <tr key={index} className="odd:bg-white even:bg-gray-50">
-                <td className="border px-3 py-1">
+              <tr
+                key={index}
+                className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+              >
+                <td className="border px-2 py-1 whitespace-nowrap">
                   {formatDate(item.entrydate)}
                 </td>
-                <td className="border px-3 py-1">{item.voucherno}</td>
-                <td className="border px-3 py-1">{item.vendorname}</td>
-                <td className="border px-3 py-1">{item.serialno}</td>
-                <td className="border px-3 py-1">{item.itemcode}</td>
-                <td className="border px-3 py-1">{item.itemname}</td>
-                <td className="border px-3 py-1">{item.quantity}</td>
-                <td className="border px-3 py-1">{item.purchaserate}</td>
-                <td className="border px-3 py-1">{item.grossamount}</td>
-                <td className="border px-3 py-1">{item.discountamount}</td>
-                <td className="border px-3 py-1">{item.netamount}</td>
+                <td className="border px-2 py-1">{item.voucherno}</td>
+
+                <td className="border px-2 py-1 max-w-[180px] truncate">
+                  {item.vendorname}
+                </td>
+
+                <td className="border px-2 py-1">{item.serialno}</td>
+                <td className="border px-2 py-1">{item.itemcode}</td>
+
+                <td className="border px-2 py-1 max-w-[220px] truncate">
+                  {item.itemname}
+                </td>
+
+                <td className="border px-2 py-1 text-right">{item.quantity}</td>
+                <td className="border px-2 py-1 text-right">{item.purchaserate}</td>
+                <td className="border px-2 py-1 text-right">{item.grossamount}</td>
+                <td className="border px-2 py-1 text-right">{item.discountamount}</td>
+                <td className="border px-2 py-1 text-right font-semibold">
+                  {item.netamount}
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Mobile Hint */}
+      <p className="text-xs text-gray-600 mt-2 sm:hidden">
+        👉 Swipe left or right to view full table
+      </p>
+
     </div>
   );
 };

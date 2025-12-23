@@ -11,128 +11,150 @@ import Salesman from '../Component/Salesman';
 import CityName from '../Component/CityName';
 
 const SaleSummary = () => {
-    const [data, setData] = useState([]);
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
-    const [itemType, setItemType] = useState('');
-    const [areaName, setAreaName] = useState('');
-    const [itemCompany, setItemCompany] = useState('');
-    const [branchCode, setBranchCode] = useState('');
-    const [cityName, setCityName] = useState('');
-    const [salesman, setSalesman] = useState('');
-    const navigate = useNavigate();
+  const [data, setData] = useState([]);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [itemType, setItemType] = useState('');
+  const [areaName, setAreaName] = useState('');
+  const [itemCompany, setItemCompany] = useState('');
+  const [branchCode, setBranchCode] = useState('');
+  const [cityName, setCityName] = useState('');
+  const [salesman, setSalesman] = useState('');
 
-    const formatDate = (date) => {
-        if (!date) return null;
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return null;
-        return d.toISOString().split('T')[0];
-    };
+  const navigate = useNavigate();
 
-    const fetchData = () => {
-        const params = {
-            cityName,
-            itemType,
-            itemCompany,
-            branchCode,
-            areaName,
-            salesman,
-            dateFrom: dateFrom ? formatDate(dateFrom) : null,
-            dateTo: dateTo ? formatDate(dateTo) : null
-        };
+  const formatDate = (date) => {
+    if (!date) return '';
+    const d = new Date(date);
+    if (isNaN(d)) return '';
+    return d.toISOString().split('T')[0];
+  };
 
-        axios.get('/api/saleSummary', { params })
-            .then(res => setData(res.data))
-            .catch(err => console.error(err));
-    };
+  const fetchData = async () => {
+    try {
+      const res = await axios.get('/api/saleSummary', {
+        params: {
+          cityName,
+          itemType,
+          itemCompany,
+          branchCode,
+          areaName,
+          salesman,
+          dateFrom: dateFrom ? formatDate(dateFrom) : null,
+          dateTo: dateTo ? formatDate(dateTo) : null,
+        },
+      });
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    return (
-        <div className="max-w-7xl mx-auto bg-sky-100 rounded-lg p-4 mt-4 text-xs sm:text-sm md:text-base">
+  return (
+    <div className="max-w-7xl mx-auto bg-sky-100 rounded-lg p-3 sm:p-4 mt-4">
 
-            {/* Title */}
-            <h2 className="text-center font-bold text-base sm:text-lg md:text-xl mb-4">
-                Sale Summary Report
-            </h2>
+      {/* Title */}
+      <h2 className="text-center font-bold text-lg sm:text-xl mb-4">
+        Sale Summary Report
+      </h2>
 
-            {/* Filters Row 1 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                <CityName onSelectCityname={setCityName} />
-                <BranchCode onSelectBranchCode={setBranchCode} />
-                <AreaName onSelectAreaname={setAreaName} />
-            </div>
+      {/* Filters Row 1 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+        <CityName onSelectCityname={setCityName} />
+        <BranchCode onSelectBranchCode={setBranchCode} />
+        <AreaName onSelectAreaname={setAreaName} />
+      </div>
 
-            {/* Filters Row 2 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-3">
-                <ItemType onSelectitemtype={setItemType} />
-                <ItemCompany onSelectitemcompany={setItemCompany} />
-                <Salesman onSelectSalesman={setSalesman} />
-            </div>
+      {/* Filters Row 2 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+        <ItemType onSelectitemtype={setItemType} />
+        <ItemCompany onSelectitemcompany={setItemCompany} />
+        <Salesman onSelectSalesman={setSalesman} />
+      </div>
 
-            {/* Date */}
-            <div className="mt-4">
-                <ReportDate
-                    dateFrom={dateFrom}
-                    setDateFrom={setDateFrom}
-                    dateTo={dateTo}
-                    setDateTo={setDateTo}
-                />
-            </div>
+      {/* Date */}
+      <div className="mt-4">
+        <ReportDate
+          dateFrom={dateFrom}
+          setDateFrom={setDateFrom}
+          dateTo={dateTo}
+          setDateTo={setDateTo}
+        />
+      </div>
 
-            {/* Buttons */}
-            <div className="flex flex-wrap gap-3 mt-4">
-                <button
-                    onClick={fetchData}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-xs sm:text-sm"
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-3 mt-4">
+        <button
+          onClick={fetchData}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+        >
+          Search
+        </button>
+
+        <button
+          onClick={() => navigate('/MainPage')}
+          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm"
+        >
+          Main Page
+        </button>
+      </div>
+
+      {/* ================= TABLE ================= */}
+      <div className="relative overflow-x-auto mt-5 bg-white rounded-lg shadow">
+        <table className="min-w-[900px] w-full border-collapse text-xs sm:text-sm">
+          <thead className="bg-gray-200 sticky top-0 z-10">
+            <tr>
+              {[
+                'Item Code',
+                'Item Name',
+                'Qty',
+                'Rate',
+                'Gross',
+                'Discount',
+                'Net',
+              ].map((head) => (
+                <th
+                  key={head}
+                  className="border px-2 py-2 text-left whitespace-nowrap"
                 >
-                    Search
-                </button>
+                  {head}
+                </th>
+              ))}
+            </tr>
+          </thead>
 
-                <button
-                    onClick={() => navigate('/MainPage')}
-                    className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-xs sm:text-sm"
-                >
-                    Main Page
-                </button>
-            </div>
+          <tbody>
+            {data.map((item, index) => (
+              <tr
+                key={index}
+                className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+              >
+                <td className="border px-2 py-1">{item.itemcode}</td>
 
-            {/* Table */}
-            <div className="overflow-x-auto mt-5">
-                <table className="w-full border border-gray-300 text-left text-xs sm:text-sm">
-                    <thead className="bg-gray-200">
-                        <tr>
-                            {[
-                                'Item Code',
-                                'Item Name',
-                                'Quantity',
-                                'Purchase Rate',
-                                'Gross Amount',
-                                'Discount Amount',
-                                'Net Amount'
-                            ].map((head) => (
-                                <th key={head} className="border px-2 py-1 whitespace-nowrap">
-                                    {head}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.map((item, index) => (
-                            <tr key={index} className="hover:bg-gray-100">
-                                <td className="border px-2 py-1">{item.itemcode}</td>
-                                <td className="border px-2 py-1">{item.itemname}</td>
-                                <td className="border px-2 py-1">{item.quantity}</td>
-                                <td className="border px-2 py-1">{item.purchaserate}</td>
-                                <td className="border px-2 py-1">{item.grossamount}</td>
-                                <td className="border px-2 py-1">{item.discountamount}</td>
-                                <td className="border px-2 py-1">{item.netamount}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                <td className="border px-2 py-1 max-w-[220px] truncate">
+                  {item.itemname}
+                </td>
 
-        </div>
-    );
+                <td className="border px-2 py-1 text-right">{item.quantity}</td>
+                <td className="border px-2 py-1 text-right">{item.purchaserate}</td>
+                <td className="border px-2 py-1 text-right">{item.grossamount}</td>
+                <td className="border px-2 py-1 text-right">{item.discountamount}</td>
+                <td className="border px-2 py-1 text-right font-semibold">
+                  {item.netamount}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Hint */}
+      <p className="text-xs text-gray-600 mt-2 sm:hidden">
+        👉 Swipe left or right to view full table
+      </p>
+
+    </div>
+  );
 };
 
 export default SaleSummary;

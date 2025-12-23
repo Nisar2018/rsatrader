@@ -14,44 +14,35 @@ const Reportd = () => {
   const navigate = useNavigate();
 
   const formatDate = (date) => {
-    if (!date) return null;
+    if (!date) return '';
     const d = new Date(date);
-    if (isNaN(d.getTime())) return null;
-
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    const year = d.getFullYear();
-    return `${year}-${month}-${day}`;
+    if (isNaN(d)) return '';
+    return d.toISOString().split('T')[0];
   };
 
-  const fetchData = () => {
-    const params = {
-      accountNumber,
-      dateFrom: dateFrom ? formatDate(dateFrom) : null,
-      dateTo: dateTo ? formatDate(dateTo) : null,
-    };
-
-    axios
-      .get('/api/Reportd', { params })
-      .then((res) => setData(res.data))
-      .catch((err) => console.error('Error fetching report:', err));
+  const fetchData = async () => {
+    try {
+      const res = await axios.get('/api/Reportd', {
+        params: {
+          accountNumber,
+          dateFrom: dateFrom ? formatDate(dateFrom) : null,
+          dateTo: dateTo ? formatDate(dateTo) : null,
+        },
+      });
+      setData(res.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const totalDebit = data.reduce(
-    (sum, item) => sum + (item.DebitAmount || 0),
-    0
-  );
-  const totalCredit = data.reduce(
-    (sum, item) => sum + (item.CreditAmount || 0),
-    0
-  );
+  const totalDebit = data.reduce((s, i) => s + (i.DebitAmount || 0), 0);
+  const totalCredit = data.reduce((s, i) => s + (i.CreditAmount || 0), 0);
 
   return (
-    <div className="max-w-7xl mx-auto bg-sky-100 mt-4 mb-6 p-4 rounded-lg">
+    <div className="max-w-7xl mx-auto bg-sky-100 mt-4 mb-6 p-3 sm:p-4 rounded-lg">
 
       {/* Title */}
-      <h2 className="text-center font-bold mb-6
-                     text-lg sm:text-xl md:text-2xl lg:text-3xl">
+      <h2 className="text-center font-bold mb-6 text-lg sm:text-2xl">
         Account Ledger Report
       </h2>
 
@@ -70,25 +61,23 @@ const Reportd = () => {
       <div className="flex flex-wrap gap-3 mb-4">
         <button
           onClick={fetchData}
-          className="px-6 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white
-                     text-xs sm:text-sm md:text-base transition"
+          className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white text-sm"
         >
           Search
         </button>
 
         <button
           onClick={() => navigate('/MainPage')}
-          className="px-6 py-2 rounded-md bg-gray-600 hover:bg-gray-700 text-white
-                     text-xs sm:text-sm md:text-base transition"
+          className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-700 text-white text-sm"
         >
           Main Page
         </button>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full border border-gray-300 text-xs sm:text-sm md:text-base">
-          <thead className="bg-gray-200">
+      {/* Table Wrapper */}
+      <div className="relative overflow-x-auto rounded-lg bg-white shadow">
+        <table className="w-full min-w-[900px] border-collapse text-xs sm:text-sm">
+          <thead className="bg-gray-200 sticky top-0 z-10">
             <tr>
               {[
                 'Date',
@@ -96,14 +85,14 @@ const Reportd = () => {
                 'V Type',
                 'Sr No',
                 'Description',
-                'Debit Amount',
-                'Credit Amount',
-              ].map((head) => (
+                'Debit',
+                'Credit',
+              ].map((h) => (
                 <th
-                  key={head}
-                  className="border px-3 py-2 text-left font-semibold"
+                  key={h}
+                  className="border px-2 sm:px-3 py-2 text-left whitespace-nowrap"
                 >
-                  {head}
+                  {h}
                 </th>
               ))}
             </tr>
@@ -111,40 +100,57 @@ const Reportd = () => {
 
           <tbody>
             {data.map((item, index) => (
-              <tr key={index} className="odd:bg-white even:bg-gray-50">
-                <td className="border px-3 py-1">
+              <tr
+                key={index}
+                className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+              >
+                <td className="border px-2 py-1 whitespace-nowrap">
                   {formatDate(item.EntryDate)}
                 </td>
-                <td className="border px-3 py-1">{item.voucherno}</td>
-                <td className="border px-3 py-1">{item.Vouchertype}</td>
-                <td className="border px-3 py-1">{item.SerialNo}</td>
-                <td className="border px-3 py-1">{item.Remarks}</td>
-                <td className="border px-3 py-1">{item.DebitAmount}</td>
-                <td className="border px-3 py-1">{item.CreditAmount}</td>
+                <td className="border px-2 py-1">{item.voucherno}</td>
+                <td className="border px-2 py-1">{item.Vouchertype}</td>
+                <td className="border px-2 py-1">{item.SerialNo}</td>
+
+                {/* Description limited on mobile */}
+                <td className="border px-2 py-1 max-w-[220px] truncate">
+                  {item.Remarks}
+                </td>
+
+                <td className="border px-2 py-1 text-right">
+                  {item.DebitAmount}
+                </td>
+                <td className="border px-2 py-1 text-right">
+                  {item.CreditAmount}
+                </td>
               </tr>
             ))}
 
             {/* Totals */}
             <tr className="font-semibold bg-gray-100">
-              <td colSpan={5} className="border px-3 py-2 text-right">
+              <td colSpan={5} className="border px-2 py-2 text-right">
                 Totals
               </td>
-              <td className="border px-3 py-2">{totalDebit}</td>
-              <td className="border px-3 py-2">{totalCredit}</td>
+              <td className="border px-2 py-2 text-right">{totalDebit}</td>
+              <td className="border px-2 py-2 text-right">{totalCredit}</td>
             </tr>
 
             {/* Balance */}
             <tr className="font-semibold bg-gray-200">
-              <td colSpan={6} className="border px-3 py-2 text-right">
+              <td colSpan={6} className="border px-2 py-2 text-right">
                 Balance
               </td>
-              <td className="border px-3 py-2">
+              <td className="border px-2 py-2 text-right">
                 {totalDebit - totalCredit}
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+
+      {/* Mobile Hint */}
+      <p className="text-xs text-gray-600 mt-2 sm:hidden">
+        👉 Swipe left/right to view full table
+      </p>
     </div>
   );
 };
