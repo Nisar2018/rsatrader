@@ -29,7 +29,7 @@ const Salesman = ({ onSelectSalesman }) => {
         htmlFor="salesman"
         className="block text-gray-700 font-semibold text-sm sm:text-base mb-2"
       >
-        Select Salesman Name:
+        Salesman Name:
       </label>
 
       {/* Select Dropdown */}
